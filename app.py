@@ -118,7 +118,7 @@ def get_spotify_token():
 
 @app.route('/')
 def ana_sayfa():
-    return render_template('index.html')
+    return "Mooduma Göre API Yayında! Lütfen ana siteyi AWS S3 üzerinden ziyaret edin."
 
 @app.route('/api/oneriler', methods=['GET'])
 def oneri_getir():
