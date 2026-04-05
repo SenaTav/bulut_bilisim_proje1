@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request, render_template
 import requests
 import random
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 app.json.ensure_ascii = False 
 
 TMDB_API_KEY = '6fc0f84971f7fd4e876f776405805c1d'
