@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOODuma Göre</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #7cbaf3; color: #ffffff;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+
+            
+            .bg-blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: #7cbaf3; }
+            .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: float 8s infinite alternate ease-in-out; }
+            .blob1 { width: 400px; height: 400px; background: green; top: -10%; left: -10%; }
+            .blob2 { width: 500px; height: 500px; background:yellow; bottom: -20%; right: -10%; animation-delay: 2s; }
+            .blob3 { width: 350px; height: 350px; background:rgb(243, 16, 141); top: 40%; left: 40%; animation-delay: 4s; }
+            @keyframes float { 100% { transform: translate(30px, 30px) scale(1.1); } }
+        }
+
+    
+        header {
+            text-align: center; padding: 60px 20px;
+            animation: fadeInDown 1s ease;
+        }
+        h1 {
+            font-weight: 900; font-size: 3.5rem; text-transform: uppercase;
+            letter-spacing: -2px; margin: 0;
+            background:rgb(217, 14, 99);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(114, 20, 236, 0.5));
+        }
+        p.subtitle {
+            font-size: 1.1rem; color: #4a06a9; margin-top: 10px; font-weight: 400;
+        }
+
+        
+        .mood-container {
+            display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 15px; padding: 0 20px; margin-bottom: 60px;
+            animation: fadeInUp 1s ease 0.3s backwards;
+        }
+        .mood-btn {
+            background-color: transparent; color: white;
+            border: 2px solid rgb(255, 255, 255);
+            border-radius: 30px; padding: 12px 25px;
+            font-size: 1rem; font-weight: 700; text-transform: uppercase;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+        
+        .mood-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            border-color: var(--mood-color);
+            box-shadow: 0 0 20px var(--mood-color);
+            color: black;
+            background-color: var(--mood-color);
+        }
+
+        
+        .result-container {
+            display: none; justify-content: center; gap: 30px; 
+            flex-wrap: wrap; padding: 0 20px 80px 20px;
+            max-width: 1400px; 
+            width: 100%;
+        }
+        
+        
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 25px;
+            width: 320px; 
+            flex-grow: 1;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.5s ease;
+            position: relative; opacity: 0; transform: translateY(30px);
+        }
+        
+        .result-card.active {
+            animation: cardShow 0.8s ease forwards;
+            border: 1px solid var(--mood-color, #0e0972);
+            box-shadow: 0 0 30px rgba(var(--mood-color-rgb), 0.3);
+        }
+
+        .result-card h2 {
+            font-size: 1.5rem; font-weight: 900; text-transform: uppercase;
+            color: #7c01ffde; margin-top: 0; margin-bottom: 20px;
+            border-bottom: 2px solid var(--mood-color, #034e98); display: inline-block;
+        }
+
+        .poster-wrapper { overflow: hidden; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .result-card img { width: 100%; transition: transform 0.6s ease; }
+        .result-card:hover img { transform: scale(1.1); }
+
+        .item-title { font-size: 1.3rem; font-weight: 700; margin: 0 0 10px 0; }
+        .item-subtitle { font-size: 1rem; color: white; margin-bottom: 15px; }
+        .ozet { font-size: 0.9rem; color: white; line-height: 1.6; text-align: left; opacity: 0.8; }
+        
+        iframe#spotifyPlayer { display: none; border-radius: 12px; margin-top: 20px; width: 100%; height: 152px; }
+
+        #statusArea { font-size: 1.2rem; font-weight: 700; display: none; margin-bottom: 30px; }
+        .loading-pulse { animation: pulse 1.5s infinite; color: #460553d3; }
+        .error-text { color: #e63946; }
+
+
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cardShow { to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-blobs">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+    </div>
+
+    <header>
+        <h1>MOODuma Göre</h1>
+        <p class="subtitle">Ruh haline göre...</p>
+    </header>
+
+    <div class="mood-container">
+        <button class="mood-btn" data-mood="mutlu" style="--mood-color: #ffb703; --mood-color-rgb: 255, 183, 3" onclick="tavsiyeGetir(this)">Mutlu</button>
+        <button class="mood-btn" data-mood="melankolik" style="--mood-color: #1e3a8a; --mood-color-rgb: 30, 58, 138" onclick="tavsiyeGetir(this)">Melankolik</button>
+        <button class="mood-btn" data-mood="enerjik" style="--mood-color: #e63946; --mood-color-rgb: 230, 57, 70" onclick="tavsiyeGetir(this)">Enerjik</button>
+        <button class="mood-btn" data-mood="asik" style="--mood-color: #f421a3; --mood-color-rgb: 255, 77, 109" onclick="tavsiyeGetir(this)">Aşık</button>
+        <button class="mood-btn" data-mood="urkutucu" style="--mood-color: #9d4edd; --mood-color-rgb: 157, 78, 221" onclick="tavsiyeGetir(this)">Ürkütücü</button>
+    </div>
+
+    <div id="statusArea"></div>
+
+    <div class="result-container" id="sonucAlani">
+        <div class="result-card" id="filmKartı">
+            <h2>🎬 Film</h2>
+            <div class="poster-wrapper">
+                <img id="filmAfiş" src="" alt="Film Afişi">
+            </div>
+            <p class="item-title" id="filmAdi">-</p>
+            <p class="ozet" id="filmOzeti">-</p>
+        </div>
+
+        <div class="result-card" id="sarkiKartı">
+            <h2>🎵 Şarkı</h2>
+            <div class="poster-wrapper">
+                <img id="sarkiKapak" src="" alt="Şarkı Kapağı">
+            </div>
+            <p class="item-title" id="sarkiAdi">-</p>
+            <p class="item-subtitle" id="sanatciAdi">-</p>
+            <iframe id="spotifyPlayer" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
+        <div class="result-card" id="aktiviteKartı">
+            <h2>🤠Aktivite</h2>
+            <div class="poster-wrapper" style="font-size: 5rem; text-align: center; padding: 30px 0; background: rgba(0,0,0,0.2);">
+                <span id="aktiviteİkonu">🤠</span>
+            </div>
+            <p class="item-title" id="aktiviteMetni" style="text-align: center;">-</p>
+        </div>
+    </div>
+
+    <script>
+        function tavsiyeGetir(btnElement) {
+            const mod = btnElement.getAttribute('data-mood');
+            const moodColor = btnElement.style.getPropertyValue('--mood-color');
+
+            
+            const statusArea = document.getElementById('statusArea');
+            statusArea.style.display = 'block';
+            statusArea.innerHTML = '<span class="loading-pulse">Senin için seçiliyor⏳</span>';
+            
+            
+            document.getElementById('sonucAlani').style.display = 'none';
+            document.getElementById('filmKartı').classList.remove('active');
+            document.getElementById('sarkiKartı').classList.remove('active');
+
+            
+            document.body.style.backgroundColor = moodColor || '#121212';
+            
+            const ikonlar = {
+                'mutlu': '☀️',
+                'melankolik': '🙇',
+                'enerjik': '🏃‍➡️',
+                'asik': '💌',
+                'ürkütücü': '😱'
+            };
+            document.getElementById('aktiviteİkonu').innerText = ikonlar[mod] || '🤠';
+           
+            document.documentElement.style.setProperty('--mood-color', moodColor);
+
+
+            
+            fetch(`/api/oneriler?mod=${mod}`)
+                .then(response => response.json())
+                .then(data => {
+                    statusArea.style.display = 'none'; 
+                    document.getElementById('sonucAlani').style.display = 'flex'; 
+                    document.getElementById('aktiviteMetni').innerText = data.aktivite_onerisi;
+
+                   
+                    document.getElementById('filmAdi').innerText = data.film_onerisi.adi;
+                    document.getElementById('filmAfiş').src = data.film_onerisi.poster;
+                    document.getElementById('filmOzeti').innerText = data.film_onerisi.ozeti || "Bu film için henüz Türkçe özet bulunmuyor.";
+
+                   
+                    document.getElementById('sarkiAdi').innerText = data.sarki_onerisi.sarki_adi;
+                    document.getElementById('sanatciAdi').innerText = data.sarki_onerisi.sanatci;
+                    document.getElementById('sarkiKapak').src = data.sarki_onerisi.kapak_resmi;
+                    
+                    
+                    let embedLinki = data.sarki_onerisi.spotify_linki.replace("/track/", "/embed/track/");
+                    document.getElementById('spotifyPlayer').src = embedLinki;
+                    document.getElementById('spotifyPlayer').style.display = "block";
+
+                    
+                    setTimeout(() => document.getElementById('filmKartı').classList.add('active'), 100);
+                    setTimeout(() => document.getElementById('sarkiKartı').classList.add('active'), 300);
+                    setTimeout(() => document.getElementById('aktiviteKartı').classList.add('active'), 500);
+                })
+                .catch(hata => {
+                    statusArea.innerHTML = '<span class="error-text">Uff, bir bağlantı sorunu oldu. Lütfen tekrar dene! 💥</span>';
+                    console.error("Hata Detayı:", hata);
+                });
+        }
+    </script>
+
+</body>
+</html>
