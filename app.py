@@ -124,7 +124,7 @@ def ana_sayfa():
 def oneri_getir():
     gelen_mod = request.args.get('mod', 'mutlu').lower() 
     
-    # 1. FİLM BULMA BÖLÜMÜ (TMDB)
+    
     tmdb_tur_id = MOOD_MAP_TMDB.get(gelen_mod, '35')
     tmdb_url = f"https://api.themoviedb.org/3/discover/movie"
 
